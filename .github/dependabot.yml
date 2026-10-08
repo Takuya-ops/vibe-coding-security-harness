@@ -1,5 +1,6 @@
 # 依存パッケージと GitHub Actions の更新を、Dependabot が pull request で知らせる。
 # 公開されたばかりの版は 3 日待つ（既定）。乗っ取られたパッケージの新しい版をすぐ取り込まないため。
+# package.json がないリポジトリでは、npm の更新確認はエラーになる（アプリのフォルダに入れれば解消する）。
 version: 2
 updates:
   - package-ecosystem: "npm"
