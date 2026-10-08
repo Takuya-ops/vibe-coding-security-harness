@@ -33,14 +33,18 @@ jobs:
   dependencies:
     name: 依存パッケージの脆弱性
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('package-lock.json') != '' }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
+        if: ${{ hashFiles('package-lock.json') != '' }}
         with:
           node-version: 22
       - name: npm audit（高・重大があれば失敗）
+        if: ${{ hashFiles('package-lock.json') != '' }}
         run: npm audit --audit-level=high
+      - name: package-lock.json がない場合
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: echo "package-lock.json がないため npm audit は飛ばしました（npm install で作られます）"
 
   dependency-review:
     name: 新しく追加した依存パッケージの確認
