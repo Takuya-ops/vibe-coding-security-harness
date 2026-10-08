@@ -1,0 +1,12 @@
+#!/bin/sh
+# コミットの直前に、秘密情報が入っていないかを調べる。
+# 有効にする: git config core.hooksPath .githooks
+#   （scripts/security/setup.sh を実行すると自動で設定されます）
+
+# 1. ハーネスの検査（Node.js だけで動く）
+node scripts/security/scan-secrets.mjs --staged || exit 1
+
+# 2. gitleaks が入っていれば、より多くの種類のキーを調べる
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --pre-commit --staged --redact --no-banner || exit 1
+fi

@@ -1,0 +1,53 @@
+# push と pull request のたびに、秘密情報と依存パッケージの脆弱性を調べる。
+name: security
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: 秘密情報のチェック
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # 過去のコミットも調べるため、履歴をすべて取得する
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: ハーネスの判定ルールのテスト
+        run: node --test scripts/security/rules.test.mjs
+      - name: ハーネスのスキャン（Git で管理しているファイル）
+        run: node scripts/security/scan-secrets.mjs --all
+      - name: gitleaks（履歴も含めて調べる）
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 組織（Organization）のリポジトリでは gitleaks.io の無料ライセンスキーが必要。個人のリポジトリでは不要
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  dependencies:
+    name: 依存パッケージの脆弱性
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('package-lock.json') != '' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: npm audit（高・重大があれば失敗）
+        run: npm audit --audit-level=high
+
+  dependency-review:
+    name: 新しく追加した依存パッケージの確認
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high

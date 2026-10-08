@@ -1,0 +1,10 @@
+# このプロジェクトで Codex を使うときの設定。
+# Codex は「信頼済み（trusted）」にしたプロジェクトでだけ、このファイル・hooks.json・rules を読み込みます。
+
+# ファイルの編集はこのフォルダの中だけ。ネットワークは既定でオフ（必要なときは Codex が許可を求める）
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+# KEY・SECRET・TOKEN を名前に含む環境変数を、Codex が実行するコマンドに渡さない
+[shell_environment_policy]
+ignore_default_excludes = false

@@ -1,0 +1,43 @@
+# Codex がサンドボックスの外で実行しようとするコマンドの扱い（フックと二重で守る）。
+# 確かめ方: codex execpolicy check --pretty --rules .codex/rules/security.rules -- rm -rf build
+
+prefix_rule(
+    pattern = [["cat", "less", "more", "head", "tail", "source"], [".env", ".env.local", ".env.production", ".dev.vars"]],
+    decision = "forbidden",
+    justification = ".env などのキーの置き場所は読まない。値が必要なら利用者に依頼する。",
+    match = ["cat .env", "head .env.local"],
+    not_match = ["cat .env.example"],
+)
+
+prefix_rule(
+    pattern = ["rm", ["-rf", "-fr", "-r", "-R"]],
+    decision = "prompt",
+    justification = "フォルダごとの削除は、利用者が確認してから。",
+    match = ["rm -rf node_modules", "rm -r dist"],
+    not_match = ["rm build.log"],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["--force", "-f", "--force-with-lease"]],
+    decision = "forbidden",
+    justification = "強制 push は GitHub 上の履歴を消すため、AI には実行させない。",
+    match = ["git push --force origin main", "git push -f"],
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "push の前に、変更内容と秘密情報が入っていないかを利用者が確認する。",
+)
+
+prefix_rule(
+    pattern = [["vercel", "netlify", "wrangler", "firebase"], ["deploy", "--prod", "publish"]],
+    decision = "prompt",
+    justification = "本番への公開は、公開前チェックリストを確認してから。",
+)
+
+prefix_rule(
+    pattern = ["supabase", "db", ["reset", "push"]],
+    decision = "prompt",
+    justification = "データベースの初期化・構造の変更は、接続先が本番でないか確認してから。",
+)

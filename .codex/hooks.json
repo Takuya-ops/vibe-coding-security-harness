@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"$(git rev-parse --show-toplevel)/scripts/security/hook.mjs\" --agent codex", "timeout": 10, "statusMessage": "秘密情報が入っていないか確認中" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch)$",
+        "hooks": [
+          { "type": "command", "command": "node \"$(git rev-parse --show-toplevel)/scripts/security/hook.mjs\" --agent codex", "timeout": 10, "statusMessage": "安全な操作か確認中" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          { "type": "command", "command": "node \"$(git rev-parse --show-toplevel)/scripts/security/hook.mjs\" --agent codex", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

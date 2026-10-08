@@ -1,0 +1,32 @@
+# ── 秘密情報（絶対に Git に入れない）──
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+firebase-adminsdk*.json
+credentials.json
+client_secret*.json
+
+# ── 依存パッケージ・ビルド成果物 ──
+node_modules/
+.next/
+dist/
+build/
+out/
+.vercel/
+.wrangler/
+.expo/
+coverage/
+
+# ── 個人の環境・ログ ──
+.DS_Store
+*.log
+.claude/settings.local.json
+.supabase/
