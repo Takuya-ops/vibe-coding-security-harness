@@ -13,7 +13,7 @@ jobs:
     name: 秘密情報のチェック
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # 過去のコミットも調べるため、履歴をすべて取得する
       - uses: actions/setup-node@v6
@@ -34,7 +34,7 @@ jobs:
     name: 依存パッケージの脆弱性
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         if: ${{ hashFiles('package-lock.json') != '' }}
         with:
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
